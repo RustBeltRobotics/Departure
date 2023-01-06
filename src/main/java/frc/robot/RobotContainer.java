@@ -26,6 +26,10 @@ public class RobotContainer {
 
   private final XboxController m_controller = new XboxController(0);
 
+  public double speedModX = 0.25;
+  public double speedModY = 0.25;
+  public double speedModZ = 0.25;
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -37,9 +41,9 @@ public class RobotContainer {
     // Right stick X axis -> rotation
     m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
             m_drivetrainSubsystem,
-            () -> -modifyAxis(m_controller.getLeftY()) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> -modifyAxis(m_controller.getLeftX()) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
-            () -> -modifyAxis(m_controller.getRightX()) * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
+            () -> -modifyAxis(m_controller.getLeftY()) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND * speedModY,
+            () -> -modifyAxis(m_controller.getLeftX()) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND * speedModX,
+            () -> -modifyAxis(m_controller.getRightX()) * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND * speedModZ
     ));
 
     // Configure the button bindings
@@ -57,6 +61,10 @@ public class RobotContainer {
     new Button(m_controller::getAButton)
             // No requirements because we don't need to interrupt anything
             .whenPressed(m_drivetrainSubsystem::zeroGyroscope);
+    new Button(m_controller::getLeftBumper)
+            .whenPressed(this::speedDown);
+    new Button(m_controller::getRightBumper)
+            .whenPressed(this::speedUp);
   }
 
   /**
@@ -89,5 +97,26 @@ public class RobotContainer {
     value = Math.copySign(value * value, value);
 
     return value;
+  }
+
+  public void speedDown() {
+    if (m_controller.getBButton()) {
+      speedModX *= 0.75;
+      speedModY *= 0.75;
+      speedModZ *= 0.75;
+    }
+  }
+  
+  public void speedUp() {
+    if (m_controller.getBButton()) {
+      speedModX /= 0.75;
+      speedModY /= 0.75;
+      speedModZ /= 0.75;
+      if (speedModX > 1.0) {
+        speedModX = 1.0;
+        speedModY = 1.0;
+        speedModZ = 1.0;
+      }
+    }
   }
 }
