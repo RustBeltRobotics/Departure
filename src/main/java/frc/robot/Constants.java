@@ -27,6 +27,7 @@ public final class Constants {
     public static final double DRIVETRAIN_WHEELBASE_METERS = 0.47;
 
     //public static final int DRIVETRAIN_PIGEON_ID = 0;
+    // FIXME Where do you get CAN IDs???
     public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 15;
     public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 16;
     public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 32;

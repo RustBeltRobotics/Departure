@@ -4,9 +4,10 @@
 
 package frc.robot.subsystems;
 
-//import com.ctre.phoenix.sensors.PigeonIMU;
-import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.SPI;
+//FIXME figure out about contents of vendordeps folder, and why some files didn't import correctly
+//import com.ctre.phoenix.sensors.PigeonIMU; //FIXME what is a Pigeon
+import com.kauailabs.navx.frc.AHRS; //FIXME What is a navx / ahrs
+import edu.wpi.first.wpilibj.SPI; //FIX ME what is this
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.swervedrivespecialties.swervelib.SwerveModule;
