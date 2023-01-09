@@ -6,11 +6,12 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
+//import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+//import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.Button;
+//import edu.wpi.first.wpilibj2.command.button.Button;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 
@@ -22,9 +23,9 @@ import frc.robot.subsystems.*;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
+  private final DrivetrainSubsystem drivetrainSubsystem = new DrivetrainSubsystem();
 
-  private final XboxController m_controller = new XboxController(0);
+  private final XboxController driverController = new XboxController(0);
 
   public double speedModX = 0.25;
   public double speedModY = 0.25;
@@ -39,11 +40,11 @@ public class RobotContainer {
     // Left stick Y axis -> forward and backwards movement
     // Left stick X axis -> left and right movement
     // Right stick X axis -> rotation
-    m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
-            m_drivetrainSubsystem,
-            () -> -modifyAxis(m_controller.getLeftY()) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND * speedModY,
-            () -> -modifyAxis(m_controller.getLeftX()) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND * speedModX,
-            () -> -modifyAxis(m_controller.getRightX()) * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND * speedModZ
+    drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
+            drivetrainSubsystem,
+            () -> -modifyAxis(driverController.getLeftY()) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND * speedModY,
+            () -> -modifyAxis(driverController.getLeftX()) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND * speedModX,
+            () -> -modifyAxis(driverController.getRightX()) * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND * speedModZ
     ));
 
     // Configure the button bindings
@@ -58,13 +59,12 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Back button zeros the gyroscope
-    new Button(m_controller::getAButton)
-            // No requirements because we don't need to interrupt anything
-            .whenPressed(m_drivetrainSubsystem::zeroGyroscope);
-    new Button(m_controller::getLeftBumper)
-            .whenPressed(this::speedDown);
-    new Button(m_controller::getRightBumper)
-            .whenPressed(this::speedUp);
+    new Trigger(driverController::getAButton).onTrue(new InstantCommand(() -> drivetrainSubsystem.zeroGyroscope()));
+
+    new Trigger(driverController::getBButton).and(driverController::getLeftBumper)
+      .onTrue(new InstantCommand(() -> this.speedDown()));
+    new Trigger(driverController::getBButton).and(driverController::getRightBumper)
+      .onTrue(new InstantCommand(() -> this.speedUp()));
   }
 
   /**
@@ -100,23 +100,19 @@ public class RobotContainer {
   }
 
   public void speedDown() {
-    if (m_controller.getBButton()) {
-      speedModX *= 0.75;
-      speedModY *= 0.75;
-      speedModZ *= 0.75;
-    }
+    speedModX *= 0.75;
+    speedModY *= 0.75;
+    speedModZ *= 0.75;
   }
   
   public void speedUp() {
-    if (m_controller.getBButton()) {
-      speedModX /= 0.75;
-      speedModY /= 0.75;
-      speedModZ /= 0.75;
-      if (speedModX > 1.0) {
-        speedModX = 1.0;
-        speedModY = 1.0;
-        speedModZ = 1.0;
-      }
+    speedModX /= 0.75;
+    speedModY /= 0.75;
+    speedModZ /= 0.75;
+    if (speedModX > 1.0) {
+      speedModX = 1.0;
+      speedModY = 1.0;
+      speedModZ = 1.0;
     }
   }
 }
