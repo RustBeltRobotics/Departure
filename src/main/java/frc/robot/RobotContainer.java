@@ -57,6 +57,8 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Back button zeros the gyroscope
     new Trigger(driverController::getAButton).onTrue(new InstantCommand(() -> drivetrainSubsystem.zeroGyroscope()));
+    
+    new Trigger(driverController::getXButton).onTrue(new InstantCommand(() -> drivetrainSubsystem.toggleWheelsLocked()));
 
     new Trigger(driverController::getBButton).and(driverController::getLeftBumper)
       .onTrue(new InstantCommand(() -> this.speedDown()));

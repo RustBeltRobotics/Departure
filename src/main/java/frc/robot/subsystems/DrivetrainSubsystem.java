@@ -4,10 +4,8 @@
 
 package frc.robot.subsystems;
 
-//FIXME figure out about contents of vendordeps folder, and why some files didn't import correctly
-//import com.ctre.phoenix.sensors.PigeonIMU; //FIXME what is a Pigeon
-import com.kauailabs.navx.frc.AHRS; //FIXME What is a navx / ahrs
-import edu.wpi.first.wpilibj.SPI; //FIX ME what is this
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.SPI;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.swervedrivespecialties.swervelib.SwerveModule;
@@ -30,6 +28,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * This can be reduced to cap the robot's maximum speed. Typically, this is useful during initial testing of the robot.
    */
   public static final double MAX_VOLTAGE = 12.0;
+  private boolean wheelsLocked = false;
 
   //  The formula for calculating the theoretical maximum velocity is:
   //   <Motor free speed RPM> / 60 * <Drive reduction> * <Wheel diameter meters> * pi
@@ -161,6 +160,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
         m_navx.zeroYaw();
   }
 
+  public void toggleWheelsLocked() {
+        wheelsLocked = !wheelsLocked;
+  }
+
   public Rotation2d getGyroscopeRotation() {
     //return Rotation2d.fromDegrees(m_pigeon.getFusedHeading());
 
@@ -181,10 +184,17 @@ public class DrivetrainSubsystem extends SubsystemBase {
   public void periodic() {
     SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SECOND);
-
-    m_frontLeftModule.set(states[0].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[0].angle.getRadians());
-    m_frontRightModule.set(states[1].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[1].angle.getRadians());
-    m_backLeftModule.set(states[2].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[2].angle.getRadians());
-    m_backRightModule.set(states[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[3].angle.getRadians());
+    if (!wheelsLocked) {
+        m_frontLeftModule.set(states[0].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[0].angle.getRadians());
+        m_frontRightModule.set(states[1].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[1].angle.getRadians());
+        m_backLeftModule.set(states[2].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[2].angle.getRadians());
+        m_backRightModule.set(states[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[3].angle.getRadians());
+    }
+    else {
+        m_frontLeftModule.set(0, 45 * (Math.PI / 180));
+        m_frontRightModule.set(0, -45 * (Math.PI / 180));
+        m_backLeftModule.set(0, -45 * (Math.PI / 180));
+        m_backRightModule.set(0, 45 * (Math.PI / 180));
+    }
   }
 }
