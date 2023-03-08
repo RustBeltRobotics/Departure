@@ -1,15 +1,15 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
-import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.FieldOrientedDriveCommand;
 import frc.robot.subsystems.Drivetrain;
+
+import static frc.robot.Constants.*;
+import static frc.robot.Utilities.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -25,33 +25,37 @@ public class RobotContainer {
     // The drive team controllers are defined here.
     private final XboxController driverController = new XboxController(0);
 
-    private double speedModXY = 0.25;
-    private double speedModR = 0.25;
+    // Limits allowable acceleration
+    private final SlewRateLimiter xLimiter;
+    private final SlewRateLimiter yLimiter;
+    private final SlewRateLimiter rLimiter;
 
-    /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
+    // These variables limit the max speed of the robot
+    private double speedModXY = 1.;
+    private double speedModR = 1.;
+
+    /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
+        // Limits allowable acceleration
+        xLimiter = new SlewRateLimiter(1. / TIME_TO_MAX_X);
+        yLimiter = new SlewRateLimiter(1. / TIME_TO_MAX_Y);
+        rLimiter = new SlewRateLimiter(1. / TIME_TO_MAX_R);
+
         // Set up the default command for the drivetrain.
         // The controls are for field-oriented driving:
         // Left stick Y axis -> forward and backwards movement
         // Left stick X axis -> left and right movement
         // Right stick X axis -> rotation
         drivetrain.setDefaultCommand(new FieldOrientedDriveCommand(drivetrain,
-            () -> -Utilities.modifyAxis(driverController.getLeftY()) * Constants.MAX_VELOCITY_METERS_PER_SECOND * speedModXY,
-            () -> -Utilities.modifyAxis(driverController.getLeftX()) * Constants.MAX_VELOCITY_METERS_PER_SECOND * speedModXY,
-            () -> -Utilities.modifyAxis(driverController.getRightX()) * Constants.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND * speedModR));
+            () -> -modifyAxis(xLimiter.calculate(driverController.getLeftY())) * MAX_VELOCITY_METERS_PER_SECOND * speedModXY,
+            () -> -modifyAxis(yLimiter.calculate(driverController.getLeftX())) * MAX_VELOCITY_METERS_PER_SECOND * speedModXY,
+            () -> -modifyAxis(rLimiter.calculate(driverController.getRightX())) * MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND * speedModR));
 
         // Configure the button bindings
         configureButtonBindings();
     }
 
-    /**
-     * Use this method to define your button->command mappings. Buttons can be
-     * created by instantiating a {@link GenericHID} or one of its subclasses
-     * ({@link edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then
-     * passing it to a {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-     */
+    /** Button -> command mappings are defined here. */
     private void configureButtonBindings() {
         // Driver Controller Bindings
         // A button zeros the gyroscope
@@ -66,12 +70,12 @@ public class RobotContainer {
     }
 
     private void speedDown() {
-        speedModXY = Utilities.clamp(speedModXY * (3/4), 0, 1);
-        speedModR = Utilities.clamp(speedModR * (3/4), 0, 1);
+        speedModXY = MathUtil.clamp(speedModXY * (3/4), 0, 1);
+        speedModR = MathUtil.clamp(speedModR * (3/4), 0, 1);
     }
 
     private void speedUp() {
-        speedModXY = Utilities.clamp(speedModXY * (4/3), 0, 1);
-        speedModR = Utilities.clamp(speedModR * (4/3), 0, 1);
+        speedModXY = MathUtil.clamp(speedModXY * (4/3), 0, 1);
+        speedModR = MathUtil.clamp(speedModR * (4/3), 0, 1);
     }
 }

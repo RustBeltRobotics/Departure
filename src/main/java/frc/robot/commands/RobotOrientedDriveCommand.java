@@ -3,15 +3,13 @@ package frc.robot.commands;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Drivetrain;
-
 import java.util.function.DoubleSupplier;
 
 /**
  * This command is used to drive the robot with a coordinate system that is
- * relative to the field, not the robot
+ * relative to the robot, not the field.
  */
-public class FieldOrientedDriveCommand extends CommandBase {
-    // private final Drivetrain drivetrain;
+public class RobotOrientedDriveCommand extends CommandBase {
     private final Drivetrain drivetrain;
 
     // DoubleSupplier objects need to be used, not double
@@ -19,7 +17,7 @@ public class FieldOrientedDriveCommand extends CommandBase {
     private final DoubleSupplier translationYSupplier;
     private final DoubleSupplier rotationSupplier;
 
-    public FieldOrientedDriveCommand(Drivetrain drivetrain,
+    public RobotOrientedDriveCommand(Drivetrain drivetrain,
             DoubleSupplier translationXSupplier,
             DoubleSupplier translationYSupplier,
             DoubleSupplier rotationSupplier) {
@@ -40,26 +38,11 @@ public class FieldOrientedDriveCommand extends CommandBase {
      */
     @Override
     public void execute() {
-        // xVel = translationXSupplier.getAsDouble();
-        // yVel = translationYSupplier.getAsDouble();
-        // vel = Math.sqrt(Math.pow(xVel, 2.) + Math.pow(yVel, 2.));
-        // alpha = Math.atan2(yVel, xVel);
-        // velPrime = translationLimiter.calculate(vel);
-        // xVelPrime = vel * Math.cos(alpha);
-        // yVelPrime = vel * Math.sin(alpha);
-
-        // SmartDashboard.putNumber("xVel", xVel);
-        // SmartDashboard.putNumber("xVelPrime", xVelPrime);
-        // SmartDashboard.putNumber("yVel", yVel);
-        // SmartDashboard.putNumber("yVelPrime", yVelPrime);
-        // SmartDashboard.putNumber("vel", vel);
-        // SmartDashboard.putNumber("velPrime", velPrime);
-        // SmartDashboard.putNumber("alpha", Math.toDegrees(alpha));
-        drivetrain.drive(ChassisSpeeds.fromFieldRelativeSpeeds(
-                translationXSupplier.getAsDouble(),
-                translationYSupplier.getAsDouble(),
-                rotationSupplier.getAsDouble(),
-                drivetrain.getGyroscopeRotation()));
+        drivetrain.drive(new ChassisSpeeds(
+            translationXSupplier.getAsDouble(),
+            translationYSupplier.getAsDouble(),
+            rotationSupplier.getAsDouble()
+        ));
     }
 
     /** When the drive method is interupted, set all velocities to zero. */
