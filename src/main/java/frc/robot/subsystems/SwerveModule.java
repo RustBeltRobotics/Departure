@@ -27,7 +27,7 @@ public class SwerveModule {
         // Setup drive motor SparkMax
         driveMotor = new CANSparkMax(driveID, MotorType.kBrushless);
         driveMotor.restoreFactoryDefaults();
-        driveMotor.setIdleMode(IdleMode.kCoast);
+        driveMotor.setIdleMode(IdleMode.kBrake);
         driveMotor.setInverted(false);
         driveMotor.setSmartCurrentLimit(DRIVE_SMART_CURRENT_LIMIT);
         driveMotor.setSecondaryCurrentLimit(DRIVE_SECONDARY_CURRENT_LIMIT);
@@ -40,7 +40,7 @@ public class SwerveModule {
         // Setup steer motor SparkMax
         steerMotor = new CANSparkMax(steerID, MotorType.kBrushless);
         steerMotor.restoreFactoryDefaults();
-        steerMotor.setIdleMode(IdleMode.kCoast);
+        steerMotor.setIdleMode(IdleMode.kBrake);
         steerMotor.setInverted(true);
         steerMotor.setSmartCurrentLimit(STEER_SMART_CURRENT_LIMIT);
         steerMotor.setSecondaryCurrentLimit(STEER_SECONDARY_CURRENT_LIMIT);
@@ -84,9 +84,9 @@ public class SwerveModule {
     public double getAbsolutePosition() {
         return absoluteSteerEncoder.getAbsolutePosition();
     }
-    // FIXME: Confirm this is correct
+
     public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(getDrivePosition(), new Rotation2d(getSteerPosition()));
+        return new SwerveModulePosition(getDrivePosition(), new Rotation2d(Math.toRadians(getSteerPosition())));
       }
 
     /** Resets the drive relative encoder to 0 and steer relative encoder to match absolute encoder */
@@ -104,7 +104,7 @@ public class SwerveModule {
      * Set's the speed and angle of an idividual module.
      * @param state the desired state (velocity, m/s, and steer angle, degrees as a Rotation2d)
      */
-    public void setState(SwerveModuleState state) {        
+    public void setState(SwerveModuleState state) {     
         // If input is minimal, ignore input to avoid reseting steer angle to 0 degrees
         if (Math.abs(state.speedMetersPerSecond) < 0.001) {
             stopModule();

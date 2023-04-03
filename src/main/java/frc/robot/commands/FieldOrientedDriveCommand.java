@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Drivetrain;
@@ -40,26 +41,12 @@ public class FieldOrientedDriveCommand extends CommandBase {
      */
     @Override
     public void execute() {
-        // xVel = translationXSupplier.getAsDouble();
-        // yVel = translationYSupplier.getAsDouble();
-        // vel = Math.sqrt(Math.pow(xVel, 2.) + Math.pow(yVel, 2.));
-        // alpha = Math.atan2(yVel, xVel);
-        // velPrime = translationLimiter.calculate(vel);
-        // xVelPrime = vel * Math.cos(alpha);
-        // yVelPrime = vel * Math.sin(alpha);
-
-        // SmartDashboard.putNumber("xVel", xVel);
-        // SmartDashboard.putNumber("xVelPrime", xVelPrime);
-        // SmartDashboard.putNumber("yVel", yVel);
-        // SmartDashboard.putNumber("yVelPrime", yVelPrime);
-        // SmartDashboard.putNumber("vel", vel);
-        // SmartDashboard.putNumber("velPrime", velPrime);
-        // SmartDashboard.putNumber("alpha", Math.toDegrees(alpha));
         drivetrain.drive(ChassisSpeeds.fromFieldRelativeSpeeds(
                 translationXSupplier.getAsDouble(),
                 translationYSupplier.getAsDouble(),
                 rotationSupplier.getAsDouble(),
-                drivetrain.getGyroscopeRotation()));
+                Rotation2d.fromDegrees(drivetrain.getGyroscopeAngle() + drivetrain.getGyroOffset())));
+                // drivetrain.getGyroscopeRotation()));
     }
 
     /** When the drive method is interupted, set all velocities to zero. */

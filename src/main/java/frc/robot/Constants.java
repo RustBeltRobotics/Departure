@@ -96,11 +96,11 @@ public final class Constants {
     public static final double AUTOBALANCE_SPEED_FACTOR = 0.25;
 
     /** Time (seconds) to get to max x velocity under manual control */
-    public static final double TIME_TO_MAX_X = 1.;
+    public static final double TIME_TO_MAX_X = .1;
     /** Time (seconds) to get to max y velocity under manual control */
-    public static final double TIME_TO_MAX_Y = 1.;
+    public static final double TIME_TO_MAX_Y = .1;
     /** Time (seconds) to get to max rotational velocity under manual control */
-    public static final double TIME_TO_MAX_R = 1.;
+    public static final double TIME_TO_MAX_R = .1;
 
     // Steer PID Constants
     public static final double STEER_P = 0.008;
